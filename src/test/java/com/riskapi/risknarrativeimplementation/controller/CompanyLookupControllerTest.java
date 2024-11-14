@@ -1,5 +1,6 @@
 package com.riskapi.risknarrativeimplementation.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.riskapi.risknarrativeimplementation.entity.CompanyEntity;
 import com.riskapi.risknarrativeimplementation.model.Company;
 import com.riskapi.risknarrativeimplementation.model.CompanyLookupRequest;
@@ -9,9 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 
 public class CompanyLookupControllerTest {
 
@@ -31,9 +34,25 @@ public class CompanyLookupControllerTest {
     @InjectMocks
     private CompanyLookupController companyLookupController;
 
+    private CompanyResponse mockCompanyResponse;
+
     @BeforeEach
-    public void setUp() {
-        openMocks(this);
+    public void setUp() throws IOException {
+        MockitoAnnotations.openMocks(this);
+        ObjectMapper objectMapper = new ObjectMapper();
+        mockCompanyResponse = objectMapper.readValue(new File("src/test/resources/mockCompanyResponse.json"),
+                CompanyResponse.class);
+    }
+
+    @Test
+    public void testGetCompanySearchFromRealTimeDataMockedJSON() {
+        CompanyLookupRequest request = new CompanyLookupRequest();
+        when(companyService.searchCompanies(any(), any(), anyBoolean())).thenReturn(mockCompanyResponse);
+
+        ResponseEntity<List<Company>> result = companyLookupController.getCompanySearch(request, "api-key", true);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(8, Objects.requireNonNull(result.getBody()).size());
     }
 
     @Test

@@ -22,14 +22,18 @@ public class Address {
     @JsonProperty("country")
     private String country;
 
+    @JsonProperty("region")
+    private String region;
+
     public Address() {
     }
 
-    public Address(String locality, String postalCode, String premises, String addressLine1, String country) {
+    public Address(String locality, String postalCode, String premises, String addressLine1, String country, String region) {
         this.locality = locality;
         this.postalCode = postalCode;
         this.premises = premises;
         this.addressLine1 = addressLine1;
         this.country = country;
+        this.region = region;
     }
 }
